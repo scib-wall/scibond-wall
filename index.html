@@ -74,6 +74,25 @@
             transition: box-shadow 0.4s ease, border-color 0.4s ease;
         }
 
+        .container.processing {
+            animation: borderPulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes borderPulse {
+            0% {
+                border-color: var(--border-color);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(var(--accent-rgb), 0.15);
+            }
+            50% {
+                border-color: var(--accent-glow);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 35px rgba(var(--accent-rgb), 0.6);
+            }
+            100% {
+                border-color: var(--border-color);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(var(--accent-rgb), 0.15);
+            }
+        }
+
         header {
             text-align: center;
             margin-bottom: 25px;
@@ -300,7 +319,7 @@
 
     <div id="flash" class="flash-overlay"></div>
 
-    <div class="container">
+    <div class="container" id="containerElement">
         <div id="formSection">
             <header>
                 <div class="logo-area" id="mainLogo">🧪</div>
@@ -449,12 +468,14 @@
             const name = document.getElementById('name').value || "Anonymous";
             const entry = document.getElementById('entry').value;
             const submitBtn = document.getElementById('submitBtn');
+            const container = document.getElementById('containerElement');
             const generatedCode = generateUniqueCode();
 
             if(!category) return;
 
             submitBtn.innerText = "Processing...";
             submitBtn.disabled = true;
+            container.classList.add('processing');
 
             const formData = new URLSearchParams();
             formData.append('category', category);
@@ -502,6 +523,7 @@
             .finally(() => {
                 submitBtn.innerText = "Initiate Synthesis";
                 submitBtn.disabled = false;
+                container.classList.remove('processing');
             });
         }
 
@@ -533,6 +555,7 @@
         function checkReply() {
             const codeInput = document.getElementById('searchCode').value.trim();
             const checkBtn = document.getElementById('checkBtn');
+            const container = document.getElementById('containerElement');
             const replyContainer = document.getElementById('replyContainer');
             const originalEntryOutput = document.getElementById('originalEntryOutput');
             const replyOutput = document.getElementById('replyOutput');
@@ -544,6 +567,7 @@
 
             checkBtn.innerText = "Scanning database...";
             checkBtn.disabled = true;
+            container.classList.add('processing');
             replyContainer.classList.add('hidden');
 
             fetch(`${GOOGLE_SCRIPT_URL}?code=${encodeURIComponent(codeInput)}`)
@@ -553,7 +577,9 @@
                 if (data.result === "success") {
                     originalEntryOutput.innerText = data.entry || "No original text found.";
 
-                    const replyText = data.reply || "No reply submitted yet! Check back later.";
+                    const defaultText = "No reply yet from the scientists. Check back later.";
+                    const replyText = data.reply && data.reply.trim() !== "" ? data.reply : defaultText;
+                    
                     const imageRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp|svg))/i;
 
                     if (imageRegex.test(replyText)) {
@@ -578,6 +604,7 @@
             .finally(() => {
                 checkBtn.innerText = "Scan Database";
                 checkBtn.disabled = false;
+                container.classList.remove('processing');
             });
         }
 
