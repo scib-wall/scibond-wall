@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SciBond Freedom Wall</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --panel-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-glow: #00ffcc; 
+            --accent-rgb: 0, 255, 204;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+        }
+
+        .flash-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transition: opacity 0.8s cubic-bezier(0.1, 0.8, 0.3, 1);
+        }
+
+        .flash-overlay.active {
+            opacity: 0.9;
+            transition: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 550px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(var(--accent-rgb), 0.15);
+            transition: box-shadow 0.4s ease, border-color 0.4s ease;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo-area {
+            display: inline-block;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.6));
+            animation: floatBubble 4s ease-in-out infinite;
+            transition: transform 0.2s ease;
+        }
+
+        @keyframes floatBubble {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(3deg); }
+        }
+
+        .reaction-shake {
+            animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0) rotate(-5deg); }
+            20%, 80% { transform: translate3d(2px, -1px, 0) rotate(8deg); }
+            30%, 50%, 70% { transform: translate3d(-3px, 1px, 0) rotate(-10deg); }
+            40%, 60% { transform: translate3d(3px, 0, 0) rotate(10deg); }
+        }
+
+        .success-pulse {
+            animation: pulseGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(var(--accent-rgb), 0.5)); }
+            100% { transform: scale(1.18); filter: drop-shadow(0 0 20px rgba(var(--accent-rgb), 0.9)); }
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        h1 span {
+            color: var(--accent-glow);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: var(--accent-glow);
+        }
+
+        select, textarea, input[type="text"] {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 12px 15px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        select:focus, textarea:focus, input[type="text"]:focus {
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.3);
+        }
+
+        .category-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .textarea-container {
+            position: relative;
+        }
+
+        .char-counter {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        button {
+            width: 100%;
+            background: transparent;
+            border: 2px solid var(--accent-glow);
+            color: var(--accent-glow);
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--accent-glow);
+            color: #000000;
+            box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5);
+        }
+
+        button:disabled {
+            border-color: var(--text-muted);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            border-color: var(--text-muted);
+            color: var(--text-muted);
+        }
+
+        .secondary-btn:hover {
+            background: var(--text-muted);
+            color: #000000;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .success-panel, .inbox-panel {
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .success-panel h2, .inbox-panel h2 {
+            margin-bottom: 10px;
+        }
+
+        .success-panel p, .inbox-panel p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .code-box {
+            background: #0d1117;
+            border: 1px dashed var(--accent-glow);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 1.3rem;
+            color: #ffffff;
+            letter-spacing: 2px;
+            margin: 15px 0;
+            user-select: all;
+            cursor: pointer;
+        }
+
+        .copy-tooltip {
+            font-size: 0.75rem;
+            color: var(--accent-glow);
+            margin-top: -10px;
+            margin-bottom: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .copy-tooltip.show {
+            opacity: 1;
+        }
+
+        .stability-volatile { color: #ff5e3a !important; font-weight: bold; animation: pulse 1s infinite alternate; }
+        .stability-stable { color: #00ffcc !important; }
+        .stability-dense { color: #ffcc00 !important; }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .reply-output {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            text-align: left;
+            margin: 20px 0;
+            line-height: 1.6;
+            color: #ffffff;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-width: 100%;
+            box-sizing: border-box;
+            border-left: 4px solid var(--accent-glow);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="flash" class="flash-overlay"></div>
+
+    <div class="container">
+        <div id="formSection">
+            <header>
+                <div class="logo-area" id="mainLogo">🧪</div>
+                <h1>SciBond <span>Synthesis</span></h1>
+                <p class="subtitle">Anonymous SciBond Org Submission Box</p>
+            </header>
+
+            <form id="submissionForm" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="category">1. Select Reaction Type</label>
+                    <select id="category" onchange="updateTheme()" required>
+                        <option value="" data-rgb="0, 255, 204" data-color="#00ffcc" data-emoji="🧪" data-desc="Select a category to begin...">-- Choose Category --</option>
+                        <option value="exothermic" data-rgb="255, 94, 58" data-color="#ff5e3a" data-emoji="🌋" data-desc="🌋 #ExothermicVent — Academic Rants">#ExothermicVent 🌋</option>
+                        <option value="chemical" data-rgb="255, 105, 180" data-color="#ff69b4" data-emoji="🤝" data-desc="🤝 #ChemicalBond — Appreciations & Crushes">#ChemicalBond 🤝</option>
+                        <option value="catalyst" data-rgb="255, 204, 0" data-color="#ffcc00" data-emoji="⚡" data-desc="⚡ #Catalyst — Study Motivation">#Catalyst ⚡</option>
+                        <option value="inert" data-rgb="173, 216, 230" data-color="#add8e6" data-emoji="☁️" data-desc="☁️ #InertGases — Random Thoughts">#InertGases ☁️</option>
+                    </select>
+                    <div class="category-desc" id="categoryDesc">Select a category to begin...</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">2. Scientist Name (Optional)</label>
+                    <input type="text" id="name" placeholder="Anonymous..." maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label for="entry">3. Your Formula (Submission)</label>
+                    <div class="textarea-container">
+                        <textarea id="entry" rows="6" placeholder="Construct your compound..." maxlength="500" oninput="handleEntryInput()" required></textarea>
+                        <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                            <div id="stabilityIndex" class="category-desc" style="margin: 0;">Stability: Awaiting compound...</div>
+                            <div class="char-counter" id="charCount">0/500</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn">Initiate Synthesis</button>
+                <button type="button" class="secondary-btn" onclick="showInbox()">Decipher Reply</button>
+            </form>
+        </div>
+
+        <div id="successSection" class="success-panel hidden">
+            <div class="success-icon success-pulse" id="successLogo">🧪</div>
+            <h2>Synthesis Successful!</h2>
+            <p>Save this unique code. You will need it to view replies later:</p>
+            <div class="code-box" id="uniqueCodeBox" title="Click to copy">GENERATING...</div>
+            <div id="copyTooltip" class="copy-tooltip">Click code to copy to clipboard</div>
+            <button onclick="resetForm()">Submit Another</button>
+            <button type="button" class="secondary-btn" onclick="showInbox()">Decipher Reply</button>
+        </div>
+
+        <div id="inboxSection" class="inbox-panel hidden">
+            <header>
+                <div class="logo-area success-pulse">📡</div>
+                <h2>Decipher Reply</h2>
+                <p class="subtitle">Enter your secret formula code below to scan for incoming responses.</p>
+            </header>
+
+            <div class="form-group">
+                <label for="searchCode">Secret Compound Code</label>
+                <input type="text" id="searchCode" placeholder="e.g. SB-XXXX" style="text-align: center; font-family: monospace; letter-spacing: 2px;">
+            </div>
+
+            <button type="button" id="checkBtn" onclick="checkReply()">Scan Database</button>
+
+            <div id="replyContainer" class="hidden">
+                <div style="text-align: left; margin-bottom: 15px;">
+                    <label style="color: var(--text-muted); font-size: 0.8rem;">Your Original Formula:</label>
+                    <div id="originalEntryOutput" style="background: #0d1117; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 15px; color: var(--text-muted); font-size: 0.95rem; white-space: pre-wrap; word-break: break-word; max-width: 100%; box-sizing: border-box; margin-top: 5px;">
+                        Loading original formula...
+                    </div>
+                </div>
+
+                <div style="text-align: left;">
+                    <label>Deciphered Reaction:</label>
+                    <div class="reply-output" id="replyOutput" style="margin-top: 5px;">
+                        Waiting for decrypt...
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="secondary-btn" onclick="goBackToForm()" style="margin-top: 20px;">Back to Synthesizer</button>
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywd0nLh5EqKAMFmJFlpiqi4EAqUGYnwtUVhAtRhc575cLpRHhozDk4vtvWcKlGgnxLpA/exec'; 
+
+        function generateUniqueCode() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = 'SB-';
+            for (let i = 0; i < 4; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        function updateTheme() {
+            const selectEl = document.getElementById('category');
+            const selectedOption = selectEl.options[selectEl.selectedIndex];
+            
+            const color = selectedOption.value ? selectedOption.getAttribute('data-color') : "#00ffcc";
+            const rgb = selectedOption.value ? selectedOption.getAttribute('data-rgb') : "0, 255, 204";
+            const emoji = selectedOption.value ? selectedOption.getAttribute('data-emoji') : "🧪";
+            const desc = selectedOption.value ? selectedOption.getAttribute('data-desc') : "Select a category to begin...";
+
+            document.documentElement.style.setProperty('--accent-glow', color);
+            document.documentElement.style.setProperty('--accent-rgb', rgb);
+
+            const logo = document.getElementById('mainLogo');
+            logo.innerText = emoji;
+            document.getElementById('categoryDesc').innerText = desc;
+
+            logo.classList.remove('reaction-shake');
+            void logo.offsetWidth; 
+            logo.classList.add('reaction-shake');
+        }
+
+        function handleEntryInput() {
+            const entryText = document.getElementById('entry').value;
+            const len = entryText.length;
+            
+            document.getElementById('charCount').innerText = `${len}/500`;
+            
+            const stabilityEl = document.getElementById('stabilityIndex');
+            stabilityEl.className = "";
+            
+            if (len === 0) {
+                stabilityEl.innerText = "Stability: Awaiting compound...";
+            } else if (len < 100) {
+                stabilityEl.innerText = "Stability: ⚠️ Highly Volatile Gas";
+                stabilityEl.classList.add('stability-volatile');
+            } else if (len >= 100 && len < 400) {
+                stabilityEl.innerText = "Stability: 🛡️ Stable Liquid Compound";
+                stabilityEl.classList.add('stability-stable');
+            } else {
+                stabilityEl.innerText = "Stability: 💎 Super-Dense Mass";
+                stabilityEl.classList.add('stability-dense');
+            }
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            const category = document.getElementById('category').value;
+            const name = document.getElementById('name').value || "Anonymous";
+            const entry = document.getElementById('entry').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const generatedCode = generateUniqueCode();
+
+            if(!category) return;
+
+            submitBtn.innerText = "Processing...";
+            submitBtn.disabled = true;
+
+            const formData = new URLSearchParams();
+            formData.append('category', category);
+            formData.append('name', name);
+            formData.append('entry', entry);
+            formData.append('code', generatedCode);
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .then(response => {
+                const flash = document.getElementById('flash');
+                flash.classList.add('active');
+                
+                document.getElementById('successLogo').innerText = document.getElementById('mainLogo').innerText;
+                
+                const codeBox = document.getElementById('uniqueCodeBox');
+                const tooltip = document.getElementById('copyTooltip');
+                codeBox.innerText = generatedCode;
+                
+                codeBox.onclick = () => {
+                    navigator.clipboard.writeText(generatedCode).then(() => {
+                        tooltip.innerText = "⚡ Compound Code Logged to Clipboard! ⚡";
+                        tooltip.classList.add('show');
+                        setTimeout(() => {
+                            tooltip.innerText = "Click code to copy to clipboard";
+                        }, 3000);
+                    });
+                };
+
+                document.getElementById('formSection').classList.add('hidden');
+                document.getElementById('inboxSection').classList.add('hidden');
+                document.getElementById('successSection').classList.remove('hidden');
+
+                setTimeout(() => {
+                    flash.classList.remove('active');
+                }, 50);
+            })
+            .catch(error => {
+                alert("Error connecting to server.");
+                console.error(error);
+            })
+            .finally(() => {
+                submitBtn.innerText = "Initiate Synthesis";
+                submitBtn.disabled = false;
+            });
+        }
+
+        function safeRenderResponse(container, text, imageUrl) {
+            container.innerText = ""; 
+            
+            if (text) {
+                const p = document.createElement('p');
+                p.style.marginBottom = "12px";
+                p.style.whiteSpace = "pre-wrap";
+                p.style.wordBreak = "break-word";
+                p.innerText = text;
+                container.appendChild(p);
+            }
+            
+            if (imageUrl) {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.style.maxWidth = "100%";
+                img.style.borderRadius = "8px";
+                img.style.border = "1px solid var(--border-color)";
+                img.style.display = "block";
+                img.style.margin = "0 auto";
+                img.alt = "Reply Image";
+                container.appendChild(img);
+            }
+        }
+
+        function checkReply() {
+            const codeInput = document.getElementById('searchCode').value.trim();
+            const checkBtn = document.getElementById('checkBtn');
+            const replyContainer = document.getElementById('replyContainer');
+            const originalEntryOutput = document.getElementById('originalEntryOutput');
+            const replyOutput = document.getElementById('replyOutput');
+
+            if (!codeInput) {
+                alert("Please enter a code to scan.");
+                return;
+            }
+
+            checkBtn.innerText = "Scanning database...";
+            checkBtn.disabled = true;
+            replyContainer.classList.add('hidden');
+
+            fetch(`${GOOGLE_SCRIPT_URL}?code=${encodeURIComponent(codeInput)}`)
+            .then(res => res.json())
+            .then(data => {
+                replyContainer.classList.remove('hidden');
+                if (data.result === "success") {
+                    originalEntryOutput.innerText = data.entry || "No original text found.";
+
+                    const replyText = data.reply || "No reply submitted yet! Check back later.";
+                    const imageRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp|svg))/i;
+
+                    if (imageRegex.test(replyText)) {
+                        const imageUrl = replyText.match(imageRegex)[0];
+                        const textWithoutUrl = replyText.replace(imageUrl, '').trim();
+                        safeRenderResponse(replyOutput, textWithoutUrl, imageUrl);
+                    } else {
+                        safeRenderResponse(replyOutput, replyText, null);
+                    }
+                } else if (data.result === "not_found") {
+                    originalEntryOutput.innerText = "N/A";
+                    safeRenderResponse(replyOutput, "⚠️ Compound code not detected in database. Check your spelling.", null);
+                } else {
+                    originalEntryOutput.innerText = "N/A";
+                    safeRenderResponse(replyOutput, "Error trying to retrieve reply.", null);
+                }
+            })
+            .catch(err => {
+                alert("Database retrieval error.");
+                console.error(err);
+            })
+            .finally(() => {
+                checkBtn.innerText = "Scan Database";
+                checkBtn.disabled = false;
+            });
+        }
+
+        function showInbox() {
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('successSection').classList.add('hidden');
+            document.getElementById('inboxSection').classList.remove('hidden');
+            document.getElementById('replyContainer').classList.add('hidden');
+            document.getElementById('searchCode').value = "";
+        }
+
+        function goBackToForm() {
+            document.getElementById('inboxSection').classList.add('hidden');
+            document.getElementById('successSection').classList.add('hidden');
+            document.getElementById('formSection').classList.remove('hidden');
+        }
+
+        function resetForm() {
+            document.getElementById('submissionForm').reset();
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('successSection').classList.add('hidden');
+            document.getElementById('inboxSection').classList.add('hidden');
+            document.getElementById('charCount').innerText = "0/500";
+            document.getElementById('category').value = "";
+            updateTheme();
+        }
+    </script>
+</body>
+</html>
