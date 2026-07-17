@@ -617,6 +617,16 @@
         }
 
         function goBackToForm() {
+            document.getElementById('submissionForm').reset();
+            document.getElementById('charCount').innerText = "0/500";
+            document.getElementById('category').value = "";
+            
+            const stabilityEl = document.getElementById('stabilityIndex');
+            stabilityEl.className = "category-desc";
+            stabilityEl.innerText = "Stability: Awaiting compound...";
+            
+            updateTheme();
+
             document.getElementById('inboxSection').classList.add('hidden');
             document.getElementById('successSection').classList.add('hidden');
             document.getElementById('formSection').classList.remove('hidden');
@@ -624,12 +634,18 @@
 
         function resetForm() {
             document.getElementById('submissionForm').reset();
+            document.getElementById('charCount').innerText = "0/500";
+            document.getElementById('category').value = "";
+            
+            const stabilityEl = document.getElementById('stabilityIndex');
+            stabilityEl.className = "category-desc";
+            stabilityEl.innerText = "Stability: Awaiting compound...";
+            
+            updateTheme();
+
             document.getElementById('formSection').classList.remove('hidden');
             document.getElementById('successSection').classList.add('hidden');
             document.getElementById('inboxSection').classList.add('hidden');
-            document.getElementById('charCount').innerText = "0/500";
-            document.getElementById('category').value = "";
-            updateTheme();
         }
     </script>
 </body>
